@@ -3,6 +3,8 @@ using Catalog.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHealthChecks();
+
 builder.Services.AddSingleton<InMemoryDatabase>(); 
 builder.Services.AddBus(builder.Configuration); 
 
@@ -21,5 +23,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.MapControllers();
-
+app.MapHealthChecks("/health");
 app.Run();
