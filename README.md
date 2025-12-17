@@ -2,7 +2,7 @@
 
 Microsserviço responsável pelo gerenciamento do catálogo de jogos (CRUD) e publicação de eventos de integração para a plataforma FIAP Cloud Games.
 
----
+----
 
 ## 🚀 Tecnologias Utilizadas
 
