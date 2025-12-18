@@ -13,8 +13,12 @@ WORKDIR "/src/Catalog.API"
 RUN dotnet build "Catalog.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 RUN dotnet publish "Catalog.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 EXPOSE 8080
+
+USER app 
+
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Catalog.API.dll"]
