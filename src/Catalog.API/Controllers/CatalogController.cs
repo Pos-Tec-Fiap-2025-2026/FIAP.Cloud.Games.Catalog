@@ -1,6 +1,5 @@
-using Catalog.Core.Events;
-using Catalog.Core.Models;
 using Catalog.Infrastructure.Repositories;
+using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 

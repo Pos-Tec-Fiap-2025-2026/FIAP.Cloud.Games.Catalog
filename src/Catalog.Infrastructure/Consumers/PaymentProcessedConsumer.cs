@@ -1,5 +1,5 @@
-using Catalog.Core.Events;
 using Catalog.Infrastructure.Repositories;
+using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
