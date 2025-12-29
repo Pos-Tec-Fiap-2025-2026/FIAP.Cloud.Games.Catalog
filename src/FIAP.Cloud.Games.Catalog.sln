@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dockerfile", "Dockerfile", 
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestration", "FIAP.Cloud.Games.Orchestration\src\Orchestration\Orchestration.csproj", "{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{F9292D7D-B44B-4959-9676-A0C6F1F2D474}.Release|x64.Build.0 = Release|Any CPU
 		{F9292D7D-B44B-4959-9676-A0C6F1F2D474}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9292D7D-B44B-4959-9676-A0C6F1F2D474}.Release|x86.Build.0 = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|x64.Build.0 = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Debug|x86.Build.0 = Debug|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|x64.ActiveCfg = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|x64.Build.0 = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|x86.ActiveCfg = Release|Any CPU
+		{911AFDE8-16D9-A933-5323-9C9AB38BDEB3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

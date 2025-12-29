@@ -1,0 +1,3 @@
+[submodule "src/FIAP.Cloud.Games.Orchestration"]
+	path = src/FIAP.Cloud.Games.Orchestration
+	url = https://github.com/Pos-Tec-Fiap-2025-2026/FIAP.Cloud.Games.Orchestration
