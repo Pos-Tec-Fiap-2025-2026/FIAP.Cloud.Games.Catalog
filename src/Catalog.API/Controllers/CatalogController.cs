@@ -50,5 +50,5 @@ namespace Catalog.API.Controllers
         }
     }
 
-    public record BuyRequest(int UserId, Guid GameId);
+    public record BuyRequest(int UserId, int GameId);
 }
