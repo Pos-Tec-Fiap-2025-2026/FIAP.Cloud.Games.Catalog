@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\FIAP.Cloud.Games.Orchestration\src\Orchestration\Orchestration.csproj" />
+		<ProjectReference Include="..\FIAP.Cloud.Games.Orchestration\src\Orchestration\Orchestration.csproj" />
 	</ItemGroup>
 
 </Project>
