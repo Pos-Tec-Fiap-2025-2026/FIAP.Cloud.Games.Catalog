@@ -16,6 +16,7 @@ namespace Catalog.Infrastructure.Extensions
 
             services.AddMassTransit(x =>
             {
+                x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("catalog", false));
                 x.AddConsumer<PaymentProcessedConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
@@ -26,9 +27,7 @@ namespace Catalog.Infrastructure.Extensions
                         h.Password(password);
                     });
 
-                    cfg.ClearSerialization();
-                    cfg.UseRawJsonSerializer();
-                    
+
                     cfg.ConfigureEndpoints(context);
                 });
             });
