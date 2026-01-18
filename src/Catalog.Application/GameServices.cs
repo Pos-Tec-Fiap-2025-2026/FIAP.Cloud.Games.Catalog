@@ -25,7 +25,7 @@ namespace Catalog.Application
         {
             var game = gameInputDto.ToEntity();
 
-            var exists = _repository.GetQuery().Any(p => p.Active && p.Name == game.Name && p.Price == game.Price);
+            var exists = _repository.GetQuery<Game>().Any(p => p.Active && p.Name == game.Name && p.Price == game.Price);
 
             if (exists)
                 return ResultBase<Game>.Failure("Jogo já cadastrado.");
@@ -72,7 +72,7 @@ namespace Catalog.Application
             if (game == null)
                 return ResultBase<Game>.Failure($"Jogo com ID {request.GameId} não foi encontrado.");
 
-            var memberEmail = _repository.GetQuery()
+            var memberEmail = _repository.GetQuery<Member>()
                                     .Where(p => p.Id == request.UserId)
                                     .Select(p => p.Name)
                                     .FirstOrDefault();
