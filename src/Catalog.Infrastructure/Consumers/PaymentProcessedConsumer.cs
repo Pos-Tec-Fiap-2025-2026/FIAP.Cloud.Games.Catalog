@@ -1,36 +1,48 @@
-using Catalog.Infrastructure.Repositories;
+using Catalog.Core.Models;
+using Catalog.Infrastructure.Persistence;
 using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Catalog.Infrastructure.Consumers
 {
     public class PaymentProcessedConsumer : IConsumer<PaymentProcessedEvent>
     {
-        private readonly InMemoryDatabase _database;
         private readonly ILogger<PaymentProcessedConsumer> _logger;
+        private readonly IRepository _repository;
 
-        public PaymentProcessedConsumer(InMemoryDatabase database, ILogger<PaymentProcessedConsumer> logger)
+        public PaymentProcessedConsumer(ILogger<PaymentProcessedConsumer> logger, IRepository repository)
         {
-            _database = database;
             _logger = logger;
+            _repository = repository;
         }
 
-        public Task Consume(ConsumeContext<PaymentProcessedEvent> context)
+        public async Task Consume(ConsumeContext<PaymentProcessedEvent> context)
         {
             var message = context.Message;
 
             if (message.Status == PaymentStatus.Approved)
             {
-                _database.AddToLibrary(message.UserId, message.OrderId);
+                var member = await _repository.GetQuery<Member>()
+                                        .Include(p => p.Games)
+                                        .Where(p => p.Id == message.UserId)
+                                        .FirstOrDefaultAsync() ?? throw new Exception("Usuário não encontrado");
+
+                var game = await _repository.GetGameByIdAsync(message.OrderId) ?? throw new Exception("Jogo não encontrado");
+
+                member.Games.Add(game);
+
+                _ = await _repository.UpdateAsync(member);
+
                 _logger.LogInformation($"[SUCESSO] Jogo {message.OrderId} liberado para o usuario {message.UserId}!");
             }
             else
             {
-                _logger.LogWarning($"[FALHA] Pagamento recusado para o usuario {message.UserId}. Jogo nao liberado.");
+                _logger.LogWarning($"[FALHA] Pagamento recusado para o usuario {message.Email}. Jogo nao liberado.");
             }
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 }
