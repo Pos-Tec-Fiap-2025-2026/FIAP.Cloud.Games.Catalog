@@ -1,15 +1,15 @@
+using Catalog.Application.Extensions;
 using Catalog.Infrastructure.Extensions;
-using Catalog.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDataBaseContext(builder.Configuration);
 builder.Services.AddHealthChecks();
-
-builder.Services.AddSingleton<InMemoryDatabase>(); 
 builder.Services.AddBus(builder.Configuration); 
-
+builder.Services.AddRepository();
+builder.Services.AddGameServices();
+builder.Services.AddJwtAuthentication(builder);
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
