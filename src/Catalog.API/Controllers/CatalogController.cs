@@ -32,7 +32,7 @@ namespace Catalog.API.Controllers
             return IsNullOrEmpty(result) ? NoContent() : Ok(result);
         }
 
-        [HttpGet("games/create")]
+        [HttpPost("games/create")]
         [Authorize(Roles = Administrador)]
         public async Task<IActionResult> CreateGame([FromBody] GameInputDto gameInputDto)
         {
@@ -90,7 +90,7 @@ namespace Catalog.API.Controllers
         {
             var result = await _gameServices.DisableGameAsync(id);
 
-            if (!result.IsSuccess)
+            if (IsNullOrEmpty(result))
                 return NotFound(result.Message);
 
             return Ok(result.Value);
