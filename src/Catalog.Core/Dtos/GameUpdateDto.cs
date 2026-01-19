@@ -13,14 +13,16 @@ namespace Catalog.Core.Dtos
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var isAnyFieldProvided = string.IsNullOrEmpty(Name)||
-                                     string.IsNullOrEmpty(Description) ||
-                                     Price.HasValue;
+            var isAtLeastOneFieldProvided =!string.IsNullOrEmpty(Name) ||
+                                            !string.IsNullOrEmpty(Description) ||
+                                            Price.HasValue ||
+                                            Active.HasValue;
 
-            if (!isAnyFieldProvided)
+            if (!isAtLeastOneFieldProvided)
             {
-                yield return new ValidationResult("Nenhum campo foi fornecido para atualização.",
-                    [nameof(GameUpdateDto)]
+                yield return new ValidationResult(
+                    "Ao menos um campo deve ser fornecido para atualização.",
+                    new[] { nameof(GameUpdateDto) }
                 );
             }
         }

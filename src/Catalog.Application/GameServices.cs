@@ -3,6 +3,7 @@ using Catalog.Core.Models;
 using Catalog.Infrastructure.Persistence;
 using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Application
 {
@@ -17,33 +18,54 @@ namespace Catalog.Application
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task<ResultBase<IEnumerable<Game>>> GetGamesAsync() => ResultBase<IEnumerable<Game>>.Ok(await _repository.GetGamesAsync());
+        public async Task<ResultBase<IEnumerable<GameDto>>> GetGamesAsync()
+        {
+            var result = await _repository.GetQuery<Game>()
+                                            .Select(p => new GameDto
+                                            {
+                                                Name = p.Name,
+                                                Price = p.Price,
+                                                Description = p.Description,
+                                                Active = p.Active,
+                                            }).ToListAsync();
 
-        public async Task<ResultBase<Game?>> GetGamesByIdAsync(int id) => ResultBase<Game?>.Ok(await _repository.GetGameByIdAsync(id));
+            return ResultBase<IEnumerable<GameDto>>.Ok(result);
+        }
 
-        public async Task<ResultBase<Game>> CreateAsync(GameInputDto gameInputDto)
+        public async Task<ResultBase<GameDto?>> GetGamesByIdAsync(int id)
+        {
+            var result = await _repository.GetGameByIdAsync(id);
+
+            var dto = new GameDto(result);
+
+            return ResultBase<GameDto?>.Ok(dto);
+        }
+
+        public async Task<ResultBase<GameDto>> CreateAsync(GameInputDto gameInputDto)
         {
             var game = gameInputDto.ToEntity();
 
             var exists = _repository.GetQuery<Game>().Any(p => p.Active && p.Name == game.Name && p.Price == game.Price);
 
             if (exists)
-                return ResultBase<Game>.Failure("Jogo já cadastrado.");
+                return ResultBase<GameDto>.Failure("Jogo já cadastrado.");
 
             var isSuccess = await _repository.CreateAsync(game!);
 
             if (!isSuccess)
-                return ResultBase<Game>.Failure("Não foi possível criar o jogo.");
+                return ResultBase<GameDto>.Failure("Não foi possível criar o jogo.");
 
-            return ResultBase<Game>.Ok(game!);
+            var dto = new GameDto(game);
+
+            return ResultBase<GameDto>.Ok(dto!);
         }
 
-        public async Task<ResultBase<Game>> UpdateAsync(int id, GameUpdateDto gameUpdateDto)
+        public async Task<ResultBase<GameDto>> UpdateAsync(int id, GameUpdateDto gameUpdateDto)
         {
             var game = await _repository.GetGameByIdAsync(id);
 
             if (game == null)
-                return ResultBase<Game>.Failure($"Jogo com ID {id} não foi encontrado.");
+                return ResultBase<GameDto>.Failure($"Jogo com ID {id} não foi encontrado.");
 
             if (!string.IsNullOrEmpty(gameUpdateDto.Name))
                 game.Name = gameUpdateDto.Name;
@@ -60,17 +82,19 @@ namespace Catalog.Application
             var isSuccess = await _repository.UpdateAsync(game);
 
             if (!isSuccess)
-                return ResultBase<Game>.Failure("Não foi possível atualizar o jogo.");
+                return ResultBase<GameDto>.Failure("Não foi possível atualizar o jogo.");
 
-            return ResultBase<Game>.Ok(game);
+            var dto = new GameDto(game);
+
+            return ResultBase<GameDto>.Ok(dto);
         }
 
-        public async Task<ResultBase<Game>> BuyGameAsync(BuyRequest request)
+        public async Task<ResultBase<GameDto>> BuyGameAsync(BuyRequest request)
         {
             var game = await _repository.GetGameByIdAsync(request.GameId);
 
             if (game == null)
-                return ResultBase<Game>.Failure($"Jogo com ID {request.GameId} não foi encontrado.");
+                return ResultBase<GameDto>.Failure($"Jogo com ID {request.GameId} não foi encontrado.");
 
             var memberEmail = _repository.GetQuery<Member>()
                                     .Where(p => p.Id == request.UserId)
@@ -78,7 +102,7 @@ namespace Catalog.Application
                                     .FirstOrDefault();
 
             if (string.IsNullOrEmpty(memberEmail))
-                return ResultBase<Game>.Failure($"Usuário com ID {request.GameId} não foi encontrado.");
+                return ResultBase<GameDto>.Failure($"Usuário com ID {request.GameId} não foi encontrado.");
 
             var orderEvent = new OrderPlacedEvent
             {
@@ -91,30 +115,35 @@ namespace Catalog.Application
 
             await _publishEndpoint.Publish(orderEvent);
 
-            return ResultBase<Game>.Ok(game, $"Compra iniciada para o jogo {game.Name}!");
+            var dto = new GameDto(game);
+
+            return ResultBase<GameDto>.Ok(dto, $"Compra iniciada para o jogo {dto.Name}!");
         }
 
-        public async Task<ResultBase<bool>> DisableGameAsync(int id)
+        public async Task<ResultBase<GameDto>> DisableGameAsync(int id)
         {
             var game = await _repository.GetGameByIdAsync(id);
 
             if (game == null)
-                return ResultBase<bool>.Failure($"Jogo com ID {id} não foi encontrado.");
+                return ResultBase<GameDto>.Failure($"Jogo com ID {id} não foi encontrado.");
 
             game.Active = false;
-            game.UpdatedAt = DateTime.Now;
 
-            return ResultBase<bool>.Ok(true);
+            await _repository.UpdateAsync(game);
+
+            var dto = new GameDto(game);
+
+            return ResultBase<GameDto>.Ok(dto);
         }
     }
 
     public interface IGameServices
     {
-        public Task<ResultBase<IEnumerable<Game>>> GetGamesAsync();
-        public Task<ResultBase<Game?>> GetGamesByIdAsync(int id);
-        public Task<ResultBase<Game>> CreateAsync(GameInputDto gameInputDto);
-        public Task<ResultBase<Game>> UpdateAsync(int id, GameUpdateDto gameUpdateDto);
-        public Task<ResultBase<Game>> BuyGameAsync(BuyRequest request);
-        public Task<ResultBase<bool>> DisableGameAsync(int id);
+        public Task<ResultBase<IEnumerable<GameDto>>> GetGamesAsync();
+        public Task<ResultBase<GameDto?>> GetGamesByIdAsync(int id);
+        public Task<ResultBase<GameDto>> CreateAsync(GameInputDto gameInputDto);
+        public Task<ResultBase<GameDto>> UpdateAsync(int id, GameUpdateDto gameUpdateDto);
+        public Task<ResultBase<GameDto>> BuyGameAsync(BuyRequest request);
+        public Task<ResultBase<GameDto>> DisableGameAsync(int id);
     }
 }
