@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Application
 {
-    internal class GameServices : IGameServices
+    public class GameServices : IGameServices
     {
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly IRepository _repository;

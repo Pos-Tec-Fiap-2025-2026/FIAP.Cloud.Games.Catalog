@@ -5,6 +5,8 @@ namespace Catalog.Core.Dtos
 {
     public class GameInputDto
     {
+        public GameInputDto() { }
+
         [Required(ErrorMessage = "O nome é obrigatório.")]
         [StringLength(100, ErrorMessage = "O nome deve ter no máximo 150 caracteres.")]
         public required string Name { get; set; }
