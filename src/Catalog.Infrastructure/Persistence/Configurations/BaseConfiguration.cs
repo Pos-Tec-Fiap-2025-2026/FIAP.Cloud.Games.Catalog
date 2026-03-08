@@ -42,6 +42,13 @@ namespace Catalog.Infrastructure.Persistence.Configurations
                 builder.Property(e => e.Id).HasColumnType(INTEGER_COLUMN_TYPE).IsRequired().UseIdentityColumn();
                 builder.Property(e => e.CreatedAt).HasColumnType(DATETIME_COLUMN_TYPE).IsRequired();
                 builder.Property(e => e.UpdatedAt).HasColumnType(DATETIME_COLUMN_TYPE).IsRequired();
+
+                builder.ToTable(tableName, tb => tb.IsTemporal(ttb =>
+                {
+                    ttb.HasPeriodStart(TemporalTableConstants.TEMPORAL_TABLE_PROP_VALIDFROM);
+                    ttb.HasPeriodEnd(TemporalTableConstants.TEMPORAL_TABLE_PROP_VALIDTO);
+                    ttb.UseHistoryTable($"{tableName}History");
+                }));
             }
 
             ConfigureEntity(builder);

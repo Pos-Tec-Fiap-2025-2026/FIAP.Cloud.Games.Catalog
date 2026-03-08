@@ -9,8 +9,9 @@ namespace Catalog.Infrastructure.Persistence.Configurations
         protected override void ConfigureEntity(EntityTypeBuilder<Game> builder)
         {
             builder.Property(p => p.Name)
-                    .HasColumnType(VARCHAR_MAX_COLUMN_TYPE)
-                    .IsRequired();
+                   .HasColumnType(string.Format(VARCHAR_LIMIT_COLUMN_TYPE, "150"))
+                   .IsRequired()
+                   .HasMaxLength(150);
 
             builder.Property(p => p.Description)
                     .HasColumnType(VARCHAR_MAX_COLUMN_TYPE)
