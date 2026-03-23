@@ -12,10 +12,7 @@ namespace Catalog.Infrastructure.Extensions
         {
             var awsSection = config.GetSection("Aws");
             var region = awsSection["Region"] ?? throw new ArgumentNullException("Region");
-            var accessKey = awsSection["AwsAccessKeyId"] ?? throw new ArgumentNullException("AwsAccessKeyId");
-            var secret = awsSection["AwsSecretAccessKey"] ?? throw new ArgumentNullException("AwsSecretAccessKey");
-            var token = awsSection["Token"] ?? throw new ArgumentNullException("Token");
-
+            
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<PaymentProcessedConsumer>();
@@ -23,11 +20,19 @@ namespace Catalog.Infrastructure.Extensions
                 {
                     cfg.Host(region, h =>
                     {
+                        var accessKey = awsSection["AwsAccessKeyId"] ?? throw new ArgumentNullException("AwsAccessKeyId");
+                        var secret = awsSection["AwsSecretAccessKey"] ?? throw new ArgumentNullException("AwsSecretAccessKey");
+                        var token = awsSection["Token"] ?? throw new ArgumentNullException("Token");
+
                         h.Credentials(new Amazon.Runtime.SessionAWSCredentials(accessKey, secret, token));
                     });
                     cfg.Message<OrderPlacedEvent>(m => m.SetEntityName("OrderPlaced"));
                     cfg.Message<PaymentProcessedEvent>(m => m.SetEntityName("PaymentProcessed"));
-                    cfg.ConfigureEndpoints(context);
+
+                    cfg.ReceiveEndpoint("Catalog-PaymentProcessed", e =>
+                    {
+                        e.ConfigureConsumer<PaymentProcessedConsumer>(context);
+                    });
                 });
             });
         }
