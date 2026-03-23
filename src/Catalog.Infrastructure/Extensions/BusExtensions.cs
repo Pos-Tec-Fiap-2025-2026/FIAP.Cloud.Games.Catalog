@@ -1,4 +1,5 @@
 using Catalog.Infrastructure.Consumers;
+using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,25 +10,23 @@ namespace Catalog.Infrastructure.Extensions
     {
         public static void AddBus(this IServiceCollection services, IConfigurationManager config)
         {
-            var busSection = config.GetSection("bus");
-            var user = busSection["user"];
-            var password = busSection["password"];
-            var host = busSection["host"];
+            var awsSection = config.GetSection("Aws");
+            var region = awsSection["Region"] ?? throw new ArgumentNullException("Region");
+            var accessKey = awsSection["AwsAccessKeyId"] ?? throw new ArgumentNullException("AwsAccessKeyId");
+            var secret = awsSection["AwsSecretAccessKey"] ?? throw new ArgumentNullException("AwsSecretAccessKey");
+            var token = awsSection["Token"] ?? throw new ArgumentNullException("Token");
 
             services.AddMassTransit(x =>
             {
-                x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("catalog", false));
                 x.AddConsumer<PaymentProcessedConsumer>();
-
-                x.UsingRabbitMq((context, cfg) =>
+                x.UsingAmazonSqs((context, cfg) =>
                 {
-                    cfg.Host(host, "/", h =>
+                    cfg.Host(region, h =>
                     {
-                        h.Username(user);
-                        h.Password(password);
+                        h.Credentials(new Amazon.Runtime.SessionAWSCredentials(accessKey, secret, token));
                     });
-
-
+                    cfg.Message<OrderPlacedEvent>(m => m.SetEntityName("OrderPlaced"));
+                    cfg.Message<PaymentProcessedEvent>(m => m.SetEntityName("PaymentProcessed"));
                     cfg.ConfigureEndpoints(context);
                 });
             });
