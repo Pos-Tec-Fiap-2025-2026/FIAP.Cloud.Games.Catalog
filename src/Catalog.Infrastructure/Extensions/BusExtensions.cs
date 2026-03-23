@@ -1,3 +1,5 @@
+using Amazon.SimpleNotificationService;
+using Amazon.SQS;
 using Catalog.Infrastructure.Consumers;
 using FIAP.Cloud.Games.Orchestration.Events;
 using MassTransit;
@@ -25,6 +27,13 @@ namespace Catalog.Infrastructure.Extensions
                         var token = awsSection["Token"] ?? throw new ArgumentNullException("Token");
 
                         h.Credentials(new Amazon.Runtime.SessionAWSCredentials(accessKey, secret, token));
+
+                        var serviceUrl = awsSection["ServiceUrl"];
+                        if (!string.IsNullOrEmpty(serviceUrl))
+                        {
+                            h.Config(new AmazonSQSConfig { ServiceURL = serviceUrl });
+                            h.Config(new AmazonSimpleNotificationServiceConfig { ServiceURL = serviceUrl });
+                        }
                     });
                     cfg.Message<OrderPlacedEvent>(m => m.SetEntityName("OrderPlaced"));
                     cfg.Message<PaymentProcessedEvent>(m => m.SetEntityName("PaymentProcessed"));
