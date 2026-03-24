@@ -1,76 +1,95 @@
-# FIAP Cloud Games – Catalog
+# FIAP Cloud Games – Catalog API
 
-Microsserviço responsável pelo gerenciamento do catálogo de jogos (CRUD) e publicação de eventos de integração para a plataforma FIAP Cloud Games.
+Microsserviço responsável pelo gerenciamento do catálogo de jogos (CRUD) da plataforma FIAP Cloud Games.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
 - **.NET 9** (Web API)
-- **MassTransit**
-- **RabbitMQ**
+- **Entity Framework Core**
+- **SQL Server**
 - **Docker & Docker Compose**
-- **Kubernetes** (Manifestos de Orquestração)
-- **Clean Architecture**
-- **Swagger** (Documentação da API)
+- **JWT** (autenticação)
+- **Swagger** (documentação da API)
+- **Temporal Tables** (histórico de alterações)
 
 ---
 
-## ⚙️ Como Executar o Projeto (Clone & Run)
+## 🏗️ Como Funciona
+
+O serviço de Catalog expõe endpoints HTTP para gerenciamento de jogos e é acessado via **API Gateway**.
+
+### Fluxo de Acesso
+
+```
+Cliente (App/Web)
+       │
+       ▼
+ API Gateway (/games/**)
+       │
+       ▼
+   Catalog API
+       │
+       ▼
+   DB Games
+```
+
+---
+
+## ⚙️ Como Executar o Projeto
 
 ### 🔧 Pré-requisitos
-
-Para executar o serviço, é necessário ter instalado:
 
 - **Docker Desktop**
 - **.NET 9 SDK**
 
-### **Executando a Solução Completa**
+---
 
-Este projeto possui orquestração unificada. Para subir a API e o RabbitMQ juntos, execute na raiz do projeto:
+### **1. Subir toda a infraestrutura (via Orchestration)**
+
+A infraestrutura completa é gerenciada pelo projeto Orchestration. Na raiz do projeto `FIAP.Cloud.Games.Orchestration`, execute:
 
 ```bash
-docker-compose up
+# Liberar execução de scripts (caso necessário)
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# Subir toda a aplicação (build, migrations, docker compose)
+.\run_all.sh
 ```
 
-📍 **Acesse a API:** [http://localhost:5001/swagger](http://localhost:5001/swagger)
-📍 **Acesse o RabbitMQ:** [http://localhost:15672](http://localhost:15672) (usuário: `guest` / senha: `guest`)
+Este comando executa automaticamente:
+- Build dos projetos
+- Aplicação das migrations no banco de dados
+- Execução do Docker Compose
 
 ---
 
-## Orquestração com Kubernetes
+### **2. Configurar o API Gateway**
 
-Este microsserviço possui manifestos prontos para deploy em Kubernetes.
-
-### Como Fazer o Deploy (Local)
-1. Garanta que o Kubernetes está habilitado no Docker Desktop.
-2. Construa a imagem localmente (necessário para o Kind/Minikube/Docker Desktop):
-```bash
-docker build -f Catalog.API/Dockerfile -t catalog-api:latest .
-```
-3. Na raiz do projeto, aplique os manifestos:
+Ainda na raiz do Orchestration, execute:
 
 ```bash
-kubectl apply -f k8s/
+./create-gateways.sh
 ```
 
-**Verificar Status**
-```bash
-kubectl get pods
+O script irá criar o gateway e exibir o endpoint gerado. As rotas do Catalog serão apresentadas no terminal.
+
+---
+
+### Autenticação
+
+As requisições exigem autenticação **JWT**. Obtenha o token pelo microsserviço de **Users** e inclua no header:
+
+```
+Authorization: Bearer <token>
 ```
 
-**Remover Deploy**
-Para limpar o cluster:
-```bash
-kubectl delete -f k8s/
-```
+---
 
 ## 📘 Observações Importantes
 
-- O projeto **possui Swagger**, acessível em `/swagger`.
-
-- A persistência dos dados é feita **em memória** para fins de demonstração (os dados resetam ao reiniciar o pod ou container).
-
-- O deploy no Kubernetes está configurado com **1 réplica** para garantir consistência dos dados em memória.
-
-- O **MassTransit** gerencia a conexão e publicação de eventos no RabbitMQ automaticamente.
+- O serviço **possui Swagger** para documentação e testes dos endpoints.
+- A autenticação **JWT é validada internamente** pela própria API — o API Gateway atua apenas como roteador.
+- A persistência é feita no **SQL Server**, com dados mantidos entre reinicializações.
+- O histórico de alterações é registrado via **Temporal Tables** no banco de dados.
