@@ -59,13 +59,6 @@ kubectl apply -f k8s/
 kubectl get pods
 ```
 
-**Acessar a Aplicação**
-Para acessar o Swagger e testar (fazendo o bind para a porta 5001 para evitar conflitos):
-```bash
-kubectl port-forward svc/catalog-service 5001:80
-```
-📍 **Swagger K8s:** [http://localhost:5001/swagger](http://localhost:5001/swagger)
-
 **Remover Deploy**
 Para limpar o cluster:
 ```bash
