@@ -44,6 +44,7 @@ Cliente (App/Web)
 - **Docker Desktop**
 - **.NET 9 SDK**
 - Ter o `appsettings.Development.json` com o valor:
+```json
 {
   "Logging": {
     "LogLevel": {
@@ -67,6 +68,7 @@ Cliente (App/Web)
     "Token": ""
   }
 }
+```
 ---
 
 ### **1. Subir toda a infraestrutura (via Orchestration)**
