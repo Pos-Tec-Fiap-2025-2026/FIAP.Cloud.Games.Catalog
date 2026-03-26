@@ -43,7 +43,30 @@ Cliente (App/Web)
 
 - **Docker Desktop**
 - **.NET 9 SDK**
-
+- Ter o `appsettings.Development.json` com o valor:
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "FIAPCloudGames": "Data Source=localhost;Persist Security Info=False;User ID=usuario;Password=senha;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True;Application Name=SQL Server Management Studio;Command Timeout=30"
+  },
+  "JwtSettings": {
+    "Secret": "FiapCloudGames_#2025_TechChallenge_JWT_0x3E8fG7H9jK2L5mN8pQ1rT4uV7wX0yZ",
+    "ExpiryMinutes": 60
+  },
+  "Aws": {
+    "Region": "us-east-1",
+    "ServiceUrl": "http://host.docker.internal:4566",
+    "AwsAccessKeyId": "",
+    "AwsSecretAccessKey": "",
+    "Token": ""
+  }
+}
 ---
 
 ### **1. Subir toda a infraestrutura (via Orchestration)**
